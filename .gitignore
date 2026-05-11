@@ -1,0 +1,20 @@
+# Pliki binarne i wykonywalne
+*.exe
+*.o
+*.out
+*.dll
+
+# Pliki wyjściowe i logi (wyniki działania crawlera)
+*.csv
+*.log
+*.txt
+
+# Pliki systemowe
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Katalogi tymczasowe i build
+/build/
+/bin/
+/obj/
