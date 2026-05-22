@@ -71,3 +71,18 @@ void init_visited() {
         hash_table[i] = NULL;
     }
 }
+
+void destroy_visited() {
+    pthread_rwlock_destroy(&visited_rwlock);
+    
+    // Zwalnianie całej tablicy haszującej
+    for (int i = 0; i < HASH_SIZE; i++) {
+        VNode* current = hash_table[i];
+        while (current != NULL) {
+            VNode* temp = current;
+            current = current->next;
+            free(temp->url);
+            free(temp);
+        }
+    }
+}

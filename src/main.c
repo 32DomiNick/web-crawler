@@ -120,6 +120,8 @@ int main() {
 
     fclose(output_csv);
     curl_global_cleanup();
+    destroy_queue();
+    destroy_visited();
     printf("\nTesty wydajnosciowe zakonczone! Zobacz wyniki_crawlowania.csv\n");
     return 0;
 }

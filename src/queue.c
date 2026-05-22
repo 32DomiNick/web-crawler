@@ -102,3 +102,17 @@ void init_queue() {
     active_tasks = 0;
     is_finished = false;
 }
+
+void destroy_queue() {
+    pthread_mutex_destroy(&queue_mutex);
+    pthread_cond_destroy(&queue_cond);
+    
+    // Zwalnianie ewentualnych resztek z kolejki
+    Node* current = head;
+    while (current != NULL) {
+        Node* temp = current;
+        current = current->next;
+        free(temp->url);
+        free(temp);
+    }
+}
