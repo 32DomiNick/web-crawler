@@ -4,13 +4,13 @@
 #include <pthread.h>
 #include <stdbool.h>
 
-// Deklaracja mutexa jako zewnętrznej zmiennej, aby main.c mógł go zainicjować/zniszczyć
+// Globalny muteks dostępny dla innych plików
 extern pthread_mutex_t queue_mutex;
 
-// Tutaj w przyszłości dodamy strukturę kolejki
 void init_queue();
 bool push_url(const char* url);
 char* pop_url();
+void task_done(); // Ta funkcja jest kluczowa dla wiedzy o końcu zadań
 void destroy_queue();
 
 #endif // QUEUE_H

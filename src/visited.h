@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <stdbool.h>
 
-// Deklaracja rwlocka
+// Globalna blokada odczytu/zapisu
 extern pthread_rwlock_t visited_rwlock;
 
 void init_visited();
