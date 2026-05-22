@@ -7,8 +7,11 @@
 #include "visited.h"
 #include "http_client.h"
 
+// Dodajemy stałą określającą limit stron do przetworzenia w jednym teście
+#define MAX_PAGES 30
+
 // Ograniczamy crawlera tylko do tej domeny 
-const char* BASE_DOMAIN = "http://example.com"; 
+const char* BASE_DOMAIN = "http://quotes.toscrape.com"; 
 
 FILE* output_csv;
 int total_pages_processed = 0; // Do pomiarów wydajności
@@ -23,12 +26,19 @@ void* worker_thread(void* arg) {
     ThreadData* data = (ThreadData*)arg;
     
     while (1) {
-        // Pobierz zadanie z kolejki (tutaj wątek śpi, jeśli nie ma co robić)
+        // Pobierz zadanie z kolejki
         char* current_url = pop_url();
         
-        // Jeśli obudził się z NULLem, oznacza to koniec pracy crawlera
         if (current_url == NULL) {
             break;
+        }
+
+        // --- OPTYMALIZACJA NA ZAJĘCIA ---
+        // Sprawdzamy limit przed wysłaniem żądania HTTP
+        if (total_pages_processed >= MAX_PAGES) {
+            free(current_url);
+            task_done();
+            continue; // Pętla kręci się dalej, by opróżnić resztę kolejki, ale bez pobierania!
         }
 
         // Przetwarza stronę (Curl, Parser, CSV)
@@ -39,7 +49,7 @@ void* worker_thread(void* arg) {
 
         free(current_url); // Zwalniamy pamięć stringa po przetworzeniu
         
-        // Zgłaszamy kolejce, że zadanie wykonane (obniża aktywny licznik)
+        // Zgłaszamy kolejce, że zadanie wykonane
         task_done(); 
     }
 

@@ -30,19 +30,37 @@ int parse_html_and_extract_links(const char* html_content, const char* base_doma
         if (link_end) {
             link_count++;
             
-            // Klonujemy wyciągnięty link do nowej zmiennej
             int link_len = link_end - search_ptr;
-            char* new_link = strndup(search_ptr, link_len);
+            char* new_link = (char*)malloc(link_len + 1);
+            
+            if (new_link != NULL) {
+                strncpy(new_link, search_ptr, link_len);
+                new_link[link_len] = '\0';
 
-            // Sprawdzamy czy link należy do naszej domeny bazowej
-            if (strncmp(new_link, base_domain, strlen(base_domain)) == 0) {
-                // Blokada ODCZYTU (is_visited) i ZAPISU (mark_visited)
-                if (!is_visited(new_link)) {
-                    mark_visited(new_link);
-                    push_url(new_link); // Wrzucamy do kolejki (Mutex)
+                char* final_link = NULL;
+
+                // Przypadek 1: Link absolutny (np. http://quotes.toscrape.com/author/Einstein)
+                if (strncmp(new_link, base_domain, strlen(base_domain)) == 0) {
+                    final_link = strdup(new_link);
                 }
+                // Przypadek 2: Link względny (np. /page/2/)
+                else if (new_link[0] == '/') {
+                    final_link = (char*)malloc(strlen(base_domain) + strlen(new_link) + 1);
+                    strcpy(final_link, base_domain);
+                    strcat(final_link, new_link);
+                }
+
+                // Jeśli pomyślnie stworzyliśmy pełen adres
+                if (final_link) {
+                    // Blokada ODCZYTU (is_visited) i ZAPISU (mark_visited)
+                    if (!is_visited(final_link)) {
+                        mark_visited(final_link);
+                        push_url(final_link); // Wrzucamy do kolejki
+                    }
+                    free(final_link);
+                }
+                free(new_link); 
             }
-            free(new_link);
             search_ptr = link_end; // Przesuwamy się dalej, by szukać kolejnych
         }
     }
